@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
+# Repo: https://github.com/tromcap1102/Canon-LBP2900-CAPT-Toolkit
 # Design by Bruce Nguyen from CCTVWIKI.COM va Claude Code Max
 # ============================================================================
 # CONG CU TONG HOP: Canon LBP2900 / LBP2900B tren Ubuntu/Mint (captdriver)
