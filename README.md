@@ -1,6 +1,6 @@
 # 🖨️ Canon LBP2900 CAPT Toolkit — LBP2900 / LBP2900B trên Ubuntu & Linux Mint
 
-**Repo:** [github.com/tromcap1102/Canon-LBP2900-CAPT-Toolkit](https://github.com/tromcap1102/Canon-LBP2900-CAPT-Toolkit)
+**Repo:** [github.com/brucenguyen1102/Canon-LBP2900-CAPT-Toolkit](https://github.com/brucenguyen1102/Canon-LBP2900-CAPT-Toolkit)
 
 Bộ công cụ tự động cài đặt, sửa lỗi và chia sẻ máy in Canon LBP2900/2900B (giao thức CAPT độc quyền) trên các bản Linux hiện đại — dùng driver mã nguồn mở thay thế thay vì driver Canon chính hãng đã cũ và khó cài.
 
@@ -35,7 +35,7 @@ Toàn bộ thao tác được gói gọn trong **một script bash duy nhất**,
 
 ```bash
 # 1. Clone repo vào một thư mục trên máy chủ Linux (nơi cắm máy in qua USB)
-git clone https://github.com/tromcap1102/Canon-LBP2900-CAPT-Toolkit.git
+git clone https://github.com/brucenguyen1102/Canon-LBP2900-CAPT-Toolkit.git
 cd Canon-LBP2900-CAPT-Toolkit
 
 # 2. Chạy script với quyền root (menu tương tác)
@@ -144,7 +144,7 @@ Máy in này khá cũ và dễ "kẹt" nếu nhiều máy gửi lệnh in gần 
 
 ## 🐛 Báo lỗi / Đóng góp
 
-Gặp lỗi hoặc có đề xuất cải tiến? Mở issue tại [github.com/tromcap1102/Canon-LBP2900-CAPT-Toolkit/issues](https://github.com/tromcap1102/Canon-LBP2900-CAPT-Toolkit/issues).
+Gặp lỗi hoặc có đề xuất cải tiến? Mở issue tại [github.com/brucenguyen1102/Canon-LBP2900-CAPT-Toolkit/issues](https://github.com/brucenguyen1102/Canon-LBP2900-CAPT-Toolkit/issues).
 
 > ⚠️ Toolkit này chỉ hỗ trợ chính thức **Canon LBP2900 / LBP2900B**. Các model khác (LBP3000, LBP3010/3018/3050...) về lý thuyết có thể hoạt động nhờ driver nền [ValdikSS/captdriver](https://github.com/ValdikSS/captdriver) nhưng **chưa được kiểm chứng** với script này (script đang hardcode mã USB `04a9:2676` riêng cho LBP2900). LBP3200/LBP3300 **không được hỗ trợ** bởi driver mã nguồn mở này.
 
