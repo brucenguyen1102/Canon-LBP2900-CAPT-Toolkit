@@ -1,0 +1,13 @@
+# Canon's own official Linux driver package (~127MB, closed-source,
+# proprietary redistribution license, and over GitHub's 100MB file limit
+# anyway) -- used locally only as a diagnostic/reference tool, never
+# intended to be redistributed from this repo.
+linux-capt-drv-v271-uken.tar.gz
+
+# Diagnostic/investigation artifacts from the engine-wedge debugging session
+# (USB packet captures, throwaway test tools, patch-diff docs) -- useful
+# locally but not needed to install or use the toolkit, so not published.
+*.pcapng
+test-files/
+captdriver-engine-hardening.patch
+

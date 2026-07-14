@@ -6,8 +6,12 @@
 # CONG CU TONG HOP: Canon LBP2900 / LBP2900B tren Ubuntu/Mint (captdriver)
 #   1) Go va cai lai LBP2900 (may nay cam truc tiep qua USB) - dung driver
 #      ValdikSS/captdriver (co page-streaming, tranh treo khi in tai lieu
-#      nhieu hinh anh) + tu dong va loi race condition CUPS backend + chia
-#      se qua LAN
+#      nhieu hinh anh), da duoc gia co them (xem captdriver-engine-hardening.patch:
+#      job ket thuc cho engine may in that su ranh truoc khi thoat, cac vong lap
+#      cho trang thai co gioi han thoi gian thay vi treo vo han, log chan doan chi
+#      tiet hon) + tu dong va loi race condition CUPS backend + chia se qua LAN
+#      + bat LogLevel debug vinh vien cho CUPS (de neu co su co sau nay thi
+#      /var/log/cups/error_log da co san du log chi tiet de phan tich)
 #   2) Cai LBP2900 qua mang tu may khac (Linux) - ket noi toi may chu da chia se
 #   3) Cai LBP2900 qua mang tu may khac (Windows) - hien huong dan (xem them
 #      file huong-dan-ket-noi-may-in.html di kem)
@@ -34,6 +38,15 @@
 # (buoc "apt-get source cups" van can mang toi kho Ubuntu, khong lien quan GitHub)
 # ============================================================================
 set -uo pipefail
+
+# Ep locale C cho TOAN BO script: tren may dat locale tieng Viet (vi_VN.UTF-8 -
+# rat pho bien voi nguoi dung Viet Nam, chinh la doi tuong toolkit nay huong
+# toi), lenh "automake" (Perl, dung trong buoc autoreconf khi build captdriver)
+# bi SEGFAULT (signal 11) do loi xu ly locale - da xac minh thuc te: cung lenh
+# do chay OK ngay khi ep LC_ALL=C. An toan de ep toan cuc vi moi thong bao cua
+# script deu la chuoi ASCII/tieng Viet khong dau co dinh, khong phu thuoc locale.
+export LC_ALL=C
+export LANG=C
 
 # Thu muc chua chinh file script nay - dung de tim cac file dong goi san
 # (captdriver-valdikss-val.tar.gz, cups-1461-usb-backend-fix.patch) dat CANH
@@ -1066,6 +1079,39 @@ configure_cupsd() {
     log_ok "Da cap nhat $CUPSD_CONF (ban sao luu: ${CUPSD_CONF}.bak-*)"
 }
 
+enable_cups_debug_logging() {
+    log_step "Bat LogLevel debug vinh vien cho CUPS (de co du log chi tiet neu co su co sau nay)"
+
+    if [[ ! -f "$CUPSD_CONF" ]]; then
+        log_warn "Khong tim thay $CUPSD_CONF, bo qua buoc bat debug log."
+        return 0
+    fi
+
+    if grep -qE '^LogLevel[ \t]+debug([ \t]|$)' "$CUPSD_CONF"; then
+        log_info "LogLevel da la 'debug' tu truoc, bo qua."
+        return 0
+    fi
+
+    cp -p "$CUPSD_CONF" "${CUPSD_CONF}.bak-$(date +%Y%m%d-%H%M%S 2>/dev/null || echo backup)"
+
+    local tmp
+    tmp=$(mktemp)
+    if grep -qE '^LogLevel[ \t]' "$CUPSD_CONF"; then
+        sed -E 's/^LogLevel[ \t].*/LogLevel debug/' "$CUPSD_CONF" > "$tmp"
+    else
+        cp "$CUPSD_CONF" "$tmp"
+        printf 'LogLevel debug\n' >> "$tmp"
+    fi
+    cp "$tmp" "$CUPSD_CONF"
+    rm -f "$tmp"
+
+    if ! systemctl restart cups; then
+        log_warn "Khoi dong lai CUPS that bai sau khi bat debug log (ban sao luu: ${CUPSD_CONF}.bak-*). Kiem tra: sudo systemctl status cups"
+        return 1
+    fi
+    log_ok "Da bat LogLevel debug vinh vien. /var/log/cups/error_log se ghi day du chi tiet (bao gom log chan doan cua captdriver) cho moi lan in - huu ich neu can phan tich su co sau nay, nhung file log se lon hon binh thuong theo thoi gian (logrotate cua he thong van tu dong xoay vong nhu binh thuong)."
+}
+
 mark_printer_shared() {
     log_step "Danh dau may in '${PRINTER_NAME}' la shared"
     if ! lpstat -p "$PRINTER_NAME" >/dev/null 2>&1; then
@@ -1187,6 +1233,8 @@ action_local_reinstall() {
         log_error "Dang ky may in that bai."
         return 1
     fi
+
+    enable_cups_debug_logging || true
 
     if detect_lan; then
         log_info "Giao dien: ${LAN_IFACE} | IP may nay: ${LAN_HOST_IP} | Subnet LAN: ${LAN_CIDR}"
@@ -1321,6 +1369,9 @@ action_fix_complex_document_hang() {
         log_error "Build/cai lai captdriver that bai."
         ok_driver=0
     fi
+
+    enable_cups_debug_logging || true
+
     if ! systemctl restart cups >/dev/null 2>&1; then
         log_warn "Khoi dong lai CUPS that bai sau khi cap nhat filter. Kiem tra: sudo systemctl status cups"
     fi
