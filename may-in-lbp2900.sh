@@ -87,8 +87,17 @@ CAPTD_SRC_DIR="${SCRIPT_DIR}/captd-persistent-daemon"
 CAPTD_SOCK="/run/captd/lbp2900.sock"
 CAPTD_BIN="/usr/local/bin/captd"
 CAPTD_SERVICE="/etc/systemd/system/captd.service"
-# 3 file nguon captdriver da va (ghi de len file cung ten trong src/ truoc build)
-CAPTD_PATCHED_SRCS=(prn_lbp2900.c printer.h capt-command.h capt-command.c)
+# Cac file nguon captdriver da va (ghi de len file cung ten trong src/ truoc
+# build). KHONG phu thuoc vao viec tarball dong san da duoc gia co hay chua:
+# GitHub Action tu dong lam moi captdriver-valdikss-val.tar.gz tu upstream moi
+# ngay, ghi de mat phan gia co (engine hardening) da tung nam trong tarball.
+# Vi vay ca ban va chong treo job 5 LAN ban gia co deu duoc dua vao day, de
+# ket qua build luon dung du tarball bi lam moi luc nao.
+#   - prn_lbp2900.c, printer.h, capt-command.h, capt-command.c: ban va job 5
+#   - capt-status.c, capt-status.h, generic-ops.c: ban gia co (engine hardening,
+#     xem captdriver-engine-hardening.patch)
+CAPTD_PATCHED_SRCS=(prn_lbp2900.c printer.h capt-command.h capt-command.c
+                    capt-status.c capt-status.h generic-ops.c)
 CANON_OFFICIAL_BUNDLE="${SCRIPT_DIR}/linux-capt-drv-v271-uken.tar.gz"
 CANON_OFFICIAL_PPD="/usr/share/cups/model/CNCUPSLBP2900CAPTK.ppd"
 CANON_OFFICIAL_URI="ccp://localhost:59687"

@@ -25,6 +25,15 @@ project's `README.md`.
 - `capt-backend.c` — a thin CUPS backend (`capt:/path/to/socket` device URI)
   that replaces the stock `usb://` backend: instead of opening the USB device
   itself, it connects to `captd` over the Unix socket for each job.
+- `capt-status.c`, `capt-status.h`, `generic-ops.c` — the engine-hardening
+  changes (bounded status-wait loops instead of loops that can hang forever,
+  more detailed diagnostic logging); the same content as
+  `captdriver-engine-hardening.patch`, regenerated against current upstream.
+  These live here rather than pre-applied inside
+  `captdriver-valdikss-val.tar.gz` because a GitHub Action refreshes that
+  tarball from upstream daily and silently overwrote the hardening (noticed
+  2026-07-22). Keeping every local change in this directory makes the build
+  independent of whatever state the bundled tarball happens to be in.
 - `prn_lbp2900.c`, `printer.h`, `capt-command.h`, `capt-command.c` — the
   patched captdriver filter sources (drop-in replacements for the same files in
   captdriver's `src/`), with the following fixes on top of upstream:
@@ -90,7 +99,7 @@ captdriver against the `usb://` backend, so every install still wedged on job
 1. Build `captd` (needs `libusb-1.0-dev`, `-lpthread`) and run it as a
    persistent service (root, for USB access) — see the comment at the top of
    `captd.c` for the wire protocol if you want to adapt it.
-2. Copy the 4 patched sources over the matching files in captdriver's `src/`
+2. Copy the 7 patched sources over the matching files in captdriver's `src/`
    and rebuild `rastertocapt` as usual.
 3. Build `capt-backend` (needs `libcups2-dev`) and install it to
    `/usr/lib/cups/backend/capt` (root-owned, mode 0700, matching CUPS's
